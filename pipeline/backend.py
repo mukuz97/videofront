@@ -3,6 +3,11 @@ from django.conf import settings
 
 
 class BaseBackend(object):
+    """
+    Base abstract class from which backends should inherit.
+
+    Unless noted otherwise, the return values of the overridden methods are not used.
+    """
 
     def upload_video(self, video_id, file_object):
         """
@@ -80,8 +85,7 @@ class BaseBackend(object):
 
     def upload_subtitle(self, video_id, subtitle_id, language_code, content):
         """
-        Upload a video subtitle file. Raise a SubtitleInvalid in case the
-        subtitle is in an invalid format.
+        Upload a video subtitle file.
 
         Args:
             video_id (str)
@@ -125,8 +129,9 @@ class BaseBackend(object):
     def subtitle_url(self, video_id, subtitle_id, language_code):
         """
         Returns the url at which the subtitle file can be downloaded. Note
-        that this method once for every subtitle object for every API videos
-        API call. So the result of this result should either be fast or cached.
+        that this method will be called once for every subtitle object for
+        every API videos API call. So the result of this result should either
+        be fast or cached.
         """
         raise NotImplementedError
 

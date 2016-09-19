@@ -155,7 +155,10 @@ def _transcode_video(public_video_id, delete=True):
         started_at=now()
     )
 
-    jobs = backend.get().start_transcoding(public_video_id)
+    # Start transcoding
+    jobs = backend.get().start_transcoding(public_video_id)# TODO what if this raises an error?
+
+    # Monitor transcoding progress
     success_job_indexes = []
     error_job_indexes = []
     errors = []
@@ -185,7 +188,7 @@ def _transcode_video(public_video_id, delete=True):
         try:
             backend.get().create_thumbnail(public_video_id, video.public_thumbnail_id)
         except Exception as e:
-            error_message = "thumbnail creation: " + e.args[0] if e.args else ""
+            error_message = "thumbnail creation: " + "\n".join(e.args)
             errors.append(error_message)
 
     # Delete related formats (to be re-created)
