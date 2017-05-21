@@ -119,7 +119,7 @@ class Backend(BaseBackend):
         return urllib.parse.urljoin(
             getattr(settings, 'ASSETS_ROOT_URL', ''),
             reverse("backend:storage-subtitle", kwargs={
-                'video_id': 'videoid',
+                'video_id': video_id,
                 'subtitle_id': subtitle_id,
                 'language_code': language_code
             })
@@ -173,7 +173,7 @@ class Backend(BaseBackend):
         return urllib.parse.urljoin(
             getattr(settings, 'ASSETS_ROOT_URL', ''),
             reverse("backend:storage-thumbnail", kwargs={
-                'video_id': 'videoid',
+                'video_id': video_id,
                 'thumbnail_id': thumb_id
             })
         )
