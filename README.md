@@ -1,4 +1,4 @@
-# Videofront [![Build Status](https://travis-ci.org/openfun/videofront.svg?branch=master)](https://travis-ci.org/openfun/videofront)
+# Videofront [![Build Status](https://travis-ci.org/regisb/videofront.svg?branch=master)](https://travis-ci.org/regisb/videofront)
 
 Videofront is a self-hosted Youtube: A scalable video hosting platform written in Python 3/Django.
 
