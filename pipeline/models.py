@@ -4,6 +4,7 @@ from django.core.validators import MinLengthValidator, MinValueValidator, MaxVal
 from django.db import models
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
+from django.utils.timezone import now
 
 from . import backend
 from . import cache
@@ -149,6 +150,26 @@ class ProcessingState(models.Model):
     def __str__(self):
         return '{} - {}'.format(self.video, self.status)
 
+    def set_pending(self):
+        self.progress = 0
+        self.status = self.STATUS_PENDING
+        self.started_at = now()
+        self.save()
+
+    def set_processing(self, progress):
+        self.progress = progress
+        self.status = self.STATUS_PROCESSING
+        self.save()
+
+    def set_success(self):
+        self.status = self.STATUS_SUCCESS
+        self.save()
+
+    def set_errors(self, errors):
+        self.message = "\n".join(errors)
+        if errors:
+            self.status = self.STATUS_FAILED
+        self.save()
 
 class Subtitle(models.Model):
 

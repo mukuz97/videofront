@@ -5,7 +5,6 @@ from time import sleep
 from celery import shared_task
 from django.db.transaction import TransactionManagementError
 from django.core.cache import cache
-from django.utils.timezone import now
 import pycaption
 
 from videofront.celery_videofront import send_task
@@ -148,12 +147,8 @@ def _transcode_video(public_video_id, delete=True):
     This function is not thread-safe. It should only be called by the transcode_video task.
     """
     video = models.Video.objects.get(public_id=public_video_id)
-    processing_state = models.ProcessingState.objects.filter(video__public_id=public_video_id)
-    processing_state.update(
-        progress=0,
-        status=models.ProcessingState.STATUS_PENDING,
-        started_at=now()
-    )
+    processing_state = video.processing_state
+    processing_state.set_pending()
 
     # Start transcoding
     jobs = backend.get().start_transcoding(public_video_id)# TODO what if this raises an error?
@@ -178,16 +173,13 @@ def _transcode_video(public_video_id, delete=True):
         # Note that we do not delete original assets once transcoding has
         # ended. This is because we want to keep the possibility of restarting
         # the transcoding process.
-        processing_state.update(
-            progress=sum(jobs_progress) * 1. / len(jobs),
-            status=models.ProcessingState.STATUS_PROCESSING
-        )
+        processing_state.set_processing(sum(jobs_progress) * 1. / len(jobs))
 
     # Create thumbnail
     if not errors:
         try:
             backend.get().create_thumbnail(public_video_id, video.public_thumbnail_id)
-        except Exception as e:
+        except Exception as e:# pylint: disable=broad-except
             error_message = "thumbnail creation: " + "\n".join(e.args)
             errors.append(error_message)
 
@@ -195,9 +187,8 @@ def _transcode_video(public_video_id, delete=True):
     models.VideoFormat.objects.filter(video=video).delete()
 
     # Check status
-    processing_state.update(message="\n".join(errors))
+    processing_state.set_errors(errors)
     if errors:
-        processing_state.update(status=models.ProcessingState.STATUS_FAILED)
         if delete:
             # In case of errors, wipe all data
             delete_video(public_video_id)
@@ -207,11 +198,12 @@ def _transcode_video(public_video_id, delete=True):
         for format_name, bitrate in backend.get().iter_formats(public_video_id):
             models.VideoFormat.objects.create(video=video, name=format_name, bitrate=bitrate)
 
-        processing_state.update(status=models.ProcessingState.STATUS_SUCCESS)
+        processing_state.set_success()
 
     # If the video was deleted while the file was transcoding, wipe all data
     if not models.Video.objects.filter(public_id=public_video_id).exists():
         delete_video(public_video_id)
+        processing_state.delete()
 
 def upload_subtitle(public_video_id, subtitle_public_id, language_code, content):
     """
