@@ -32,19 +32,24 @@ VIDEO_STORAGE_ROOT = '/opt/videofront/storage/' # FIXME
 # https://support.google.com/youtube/answer/1722171
 # https://support.google.com/youtube/answer/6375112
 FFMPEG_PRESETS = {
-    'HD': {
+    'HD': { # 720p
         'size': '1280x720',
         'video_bitrate': '5120k',
-        'audio_bitrate': '384k',
+        'audio_bitrate': '192k',
     },
-    'SD': {
+    'SD': { # 480p
         'size': '854x480',
         'video_bitrate': '2560k',
-        'audio_bitrate': '4096k',
+        'audio_bitrate': '128k',
     },
-    'LD': {
+    'LD': { # 360p
         'size': '640x360',
         'video_bitrate': '1024k',
-        'audio_bitrate': '426x240',
+        'audio_bitrate': '128k',
     },
 }
+
+# Name of the FFMPEG_PRESETS preset that will be used to generate a thumbnail.
+# Note that the thumbnail will automatically be resized, so you should pick the
+# preset with the best video size.
+FFMPEG_THUMBNAILS_PRESET = 'HD'
