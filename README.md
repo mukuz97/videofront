@@ -283,14 +283,14 @@ Reload nginx configuration:
 
     sudo service nginx reload
 
-## TODO
+## Future work
 
-Videofront is still in early beta, although it is already used in production at [FUN-MOOC](https://fun-mooc.fr). Here is the list of upcoming features, by decreasing priority:
+Videofront is still in early beta, although it is already used in production at [FUN-MOOC](https://www.fun-mooc.fr). Here is the list of upcoming features, by decreasing priority:
 
 - Creation of an `/embed` endpoint for easy video integration inside iframes
 - Viewer statistics
 - More evolved permission system, with public & private videos
-- ... We are open to feature requests!
+- ... We are open to feature requests! Just [open a new issue](https://github.com/regisb/videofront/issues), describe your problem and we'll start the conversation from there.
 
 ## License
 
