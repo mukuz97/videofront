@@ -13,6 +13,7 @@ def ffmpeg_transcode_video(src_path, dst_path, ffmpeg_presets):
     command = [
         utils.ffmpeg_binary(),
         '-y',# overwrite without asking
+        '-loglevel', 'error',
         '-i', src_path,# input path
         '-c:v', 'libx264',# video codec
         '-c:a', 'aac',# audio codec
@@ -31,6 +32,7 @@ def ffmpeg_create_thumbnail(src_path, dst_path):
     command = [
         utils.ffmpeg_binary(),
         '-y',# overwrite without asking
+        '-loglevel', 'error',
         '-i', src_path,# input path
         '-ss', '00:00:00.000',
         '-vframes', '1',
