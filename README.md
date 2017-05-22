@@ -182,6 +182,12 @@ In the following, we assume the following file hierarchy:
 
     pip install gunicorn
 
+### Collect static assets
+
+By default, static assets will be stored in the `static/` subfolder:
+
+    ./manage.py collectstatic
+
 ### Process supervision
 
 The recommended approach is to start gunicorn and celery workers under supervision with `supervisorctl`.
@@ -245,8 +251,16 @@ Recommended nginx configuration in `/etc/nginx/sites-enabled/videofront`:
         client_max_body_size 20M;
 
         location /static/ {
-            # This depends on the STATIC_ROOT setting
-            alias /opt/videofront/static/;
+            # This is according to the STATIC_ROOT setting
+            alias /opt/videofront/videofront/static/;
+        }
+        # The following is necessary only if you are planning on streaming videos
+        # from disk with the local backend
+        location /backend/storage/ {
+            # Here we assume that the ASSETS_ROOT_URL setting refers to the same
+            # domain name that is used to access the API.
+            # The path defined here should be VIDEO_STORAGE_ROOT/.
+            alias /home/regis/Desktop/tmp/videos/videofront/storage/;
         }
         
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
