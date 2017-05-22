@@ -88,12 +88,27 @@ class LocalBackendTests(TestCase):
         self.assertEqual(video_file_path, os.path.join(VIDEO_STORAGE_ROOT, video_url[len('/backend/storage/'):]))
         self.assertEqual(200, response.status_code)
         self.assertEqual(b'video content', response.getvalue())
+        self.assertEqual('*', response.get('Access-Control-Allow-Origin'))
 
     @override_settings(ASSETS_ROOT_URL="http://example.com")
     def test_video_url_with_root_url(self):
         backend = local_backend.Backend()
         self.assertEqual("http://example.com/backend/storage/videos/videoid/HD.mp4",
                          backend.video_url("videoid", "HD"))
+
+    @override_settings(ALLOWED_ORIGIN='myspace.com')
+    def test_stream_video_with_access_control(self):
+        backend = local_backend.Backend()
+        video_url = backend.video_url('videoid', 'HD')
+        video_file_path = backend.get_video_file_path('videoid', 'HD')
+
+        # Create video file
+        os.makedirs(os.path.dirname(video_file_path))
+        with open(video_file_path, 'wb') as video_file:
+            video_file.write(b'video content')
+
+        response = self.client.get(video_url)
+        self.assertEqual('myspace.com', response.get('Access-Control-Allow-Origin'))
 
     def test_download_urls(self):
         url = reverse('backend:storage-video', kwargs={'video_id': 'videoid', 'format_name': 'HD'})
@@ -184,6 +199,7 @@ class LocalBackendTests(TestCase):
         self.assertEqual(subtitle_file_path, os.path.join(VIDEO_STORAGE_ROOT, subtitle_url[len('/backend/storage/'):]))
         self.assertEqual(200, response.status_code)
         self.assertEqual(b'subtitle content', response.getvalue())
+        self.assertEqual('*', response.get('Access-Control-Allow-Origin'))
 
     @override_settings(ASSETS_ROOT_URL="http://example.com")
     def test_subtitle_url_with_root_url(self):

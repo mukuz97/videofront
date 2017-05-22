@@ -21,6 +21,12 @@ BACKEND_URLS = 'contrib.plugins.local.urls'
 # from VIDEO_STORAGE_ROOT.
 # ASSETS_ROOT_URL = 'http://static.yourdomain.com'
 
+# Origins from which static assets (videos, subtitles) may be downloaded. By
+# default, videos may be embedded in all websites. This value will be used to
+# define the Access-Control-Allow-Origin header (see
+# https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS)
+# ALLOWED_ORIGIN = '*'
+
 # The absolute path to the directory where video assets will be stored
 VIDEO_STORAGE_ROOT = '/opt/videofront/storage/' # FIXME
 
