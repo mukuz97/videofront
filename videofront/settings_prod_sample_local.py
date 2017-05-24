@@ -40,18 +40,18 @@ VIDEO_STORAGE_ROOT = '/opt/videofront/storage/' # FIXME
 FFMPEG_PRESETS = {
     'HD': { # 720p
         'size': '1280x720',
-        'video_bitrate': '5120k',
-        'audio_bitrate': '192k',
+        'video_bitrate': '2200k',
+        'audio_bitrate': '128k',
     },
     'SD': { # 480p
         'size': '854x480',
-        'video_bitrate': '2560k',
-        'audio_bitrate': '128k',
+        'video_bitrate': '1136k',
+        'audio_bitrate': '64k',
     },
     'LD': { # 360p
         'size': '640x360',
-        'video_bitrate': '1024k',
-        'audio_bitrate': '128k',
+        'video_bitrate': '896k',
+        'audio_bitrate': '64k',
     },
 }
 
