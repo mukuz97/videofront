@@ -83,7 +83,8 @@ class VideoSerializer(serializers.ModelSerializer):
     subtitles = SubtitleSerializer(many=True, read_only=True)
     formats = VideoFormatSerializer(many=True, read_only=True)
     thumbnail = serializers.CharField(source='thumbnail_url', read_only=True)
+    poster_frames = serializers.CharField(source='poster_frames_url', read_only=True)
 
     class Meta:
-        fields = ('id', 'title', 'processing', 'subtitles', 'formats', 'thumbnail',)
+        fields = ('id', 'title', 'processing', 'subtitles', 'formats', 'thumbnail', 'poster_frames',)
         model = models.Video

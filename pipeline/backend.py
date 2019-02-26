@@ -145,6 +145,16 @@ class BaseBackend(object):
         """
         return ''
 
+    def poster_frames_url(self, video_id, poster_id):
+        """
+        Returns the url at which the video poster frame vtt can be downloaded. This
+        should be a fast method.
+
+        This feature is optional. If undefined, the thumbnail url will be an
+        empty string.
+        """
+        return ''
+
 
 class UndefinedPluginBackend(Exception):
     pass

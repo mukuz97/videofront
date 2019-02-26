@@ -18,6 +18,9 @@ def storage_subtitle(request, video_id, subtitle_id, language_code):
 def storage_thumbnail(request, video_id, thumbnail_id):
     return serve_file(request, Backend.get_thumbnail_file_path(video_id, thumbnail_id))
 
+def storage_poster_frames(request, video_id, poster_id):
+    return serve_file_with_access_control(request, Backend.get_poster_frames_file_path(video_id, poster_id))
+
 def serve_file_with_access_control(request, path):
     response = serve_file(request, path)
     # This header is required for serving assets to different domains because of CORS

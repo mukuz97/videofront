@@ -19,4 +19,9 @@ urlpatterns = [
         views.storage_thumbnail,
         name='storage-thumbnail'
     ),
+    url(
+        r'^storage/videos/(?P<video_id>.+)/{}/(?P<poster_id>.+)\.vtt$'.format(backend.Backend.THUMBNAILS_DIRNAME),
+        views.storage_poster_frames,
+        name='storage-poster-frames'
+    ),
 ]

@@ -54,6 +54,15 @@ class Backend(BaseBackend):
         return "{}.jpg".format(thumb_id)
 
     @staticmethod
+    def get_poster_frames_file_path(video_id, poster_id):
+        file_name = Backend.get_poster_frames_file_name(poster_id)
+        return Backend.get_file_path(video_id, Backend.THUMBNAILS_DIRNAME, file_name)
+
+    @staticmethod
+    def get_poster_frames_file_name(poster_id):
+        return "{}.vtt".format(poster_id)
+
+    @staticmethod
     def get_file_path(*args):
         """
         Get an absolute file path inside the VIDEO_STORAGE_ROOT directory.
@@ -169,6 +178,19 @@ class Backend(BaseBackend):
         )
         tasks.ffmpeg_create_thumbnail(video_file_path, thumbnail_file_path)
 
+    def create_poster_frames(self, video_id, poster_id):
+        video_file_path = self.get_video_file_path(video_id, settings.FFMPEG_THUMBNAILS_PRESET)
+        poster_frames_vtt_file_path = self.make_file_path(
+            video_id,
+            self.THUMBNAILS_DIRNAME,
+            self.get_poster_frames_file_name(poster_id)
+        )
+        tasks.ffmpeg_create_poster_frames(
+            video_file_path,
+            poster_frames_vtt_file_path,
+            self.get_poster_frames_file_name(poster_id)
+        )
+
     def thumbnail_url(self, video_id, thumb_id):
         return urllib.parse.urljoin(
             getattr(settings, 'ASSETS_ROOT_URL', ''),
@@ -178,6 +200,14 @@ class Backend(BaseBackend):
             })
         )
 
+    def poster_frames_url(self, video_id, poster_id):
+        return urllib.parse.urljoin(
+            getattr(settings, 'ASSETS_ROOT_URL', ''),
+            reverse("backend:storage-poster-frames", kwargs={
+                'video_id': video_id,
+                'poster_id': poster_id
+            })
+        )
 
 def copy_content(file_object, path):
     """

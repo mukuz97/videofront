@@ -1,4 +1,6 @@
 import subprocess
+import time
+import os
 
 from celery import shared_task
 
@@ -39,3 +41,51 @@ def ffmpeg_create_thumbnail(src_path, dst_path):
         dst_path,
     ]
     subprocess.call(command)
+
+@shared_task(name='ffmpeg_create_poster_frames')
+def ffmpeg_create_poster_frames(src_path, dst_path, pf_file):
+    command = [
+        utils.ffmpeg_binary(),
+        '-y',# overwrite without asking
+        '-loglevel', 'error',
+        '-i', src_path,# input path
+        '-vf', 'fps=1/10',# make thumbs every 10 seconds
+        '-q:v', '2',#Set quality of thumbs(lower is better)
+        dst_path + '_%d.jpg',
+    ]
+    subprocess.call(command)
+
+    #Calculate video duration
+    command = 'ffprobe -i {} -show_entries format=duration -v quiet -of csv="p=0"'.format(src_path)
+    output = subprocess.check_output(
+        command,
+        shell=True, # Let this run in the shell
+        stderr=subprocess.STDOUT
+    )
+    duration = float(output)
+    thumb_count = int(duration / 10)
+    if duration > thumb_count * 10:
+        thumb_count += 1
+
+    # resize thumbs
+    for i in range(1, thumb_count+1):
+        image_path = '{}_{}.jpg'.format(dst_path, i)
+        if os.path.exists(image_path):
+            utils.resize_image(image_path, image_path, 160)
+        else:
+            thumb_count -= 1#Number of thumbs were overestimated
+    
+    # Create the vtt file
+    f = open(dst_path, 'w')
+    f.write('WEBVTT\n\n')
+    for i in range(1,thumb_count):
+        f.write('{}.000 --> {}.000\n'.format(
+            time.strftime('%H:%M:%S', time.gmtime((i-1) * 10)),
+            time.strftime('%H:%M:%S', time.gmtime(i * 10))
+        ))
+        f.write('{}_{}.jpg#xywh=0,0,160,90\n\n'.format(pf_file, i))
+    f.write('{}.000 --> {}.000\n'.format(
+        time.strftime('%H:%M:%S', time.gmtime((thumb_count - 1) * 10)),
+        time.strftime('%H:%M:%S', time.gmtime(duration))
+    ))
+    f.write('{}_{}.jpg#xywh=0,0,160,90'.format(pf_file, thumb_count))

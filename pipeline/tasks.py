@@ -183,6 +183,14 @@ def _transcode_video(public_video_id, delete=True):
             error_message = "thumbnail creation: " + "\n".join(e.args)
             errors.append(error_message)
 
+    # Create poster frames
+    if not errors:
+        try:
+            backend.get().create_poster_frames(public_video_id, video.public_poster_frames_id)
+        except Exception as e:# pylint: disable=broad-except
+            error_message = "poster frame creation: " + "\n".join(e.args)
+            errors.append(error_message)
+
     # Delete related formats (to be re-created)
     models.VideoFormat.objects.filter(video=video).delete()
 
